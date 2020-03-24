@@ -1,21 +1,24 @@
-"""vote URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
 from django.urls import path
+from vote.views import (
+    create_vote_view,
+    read_vote_view,
+    create_poll_view,
+    read_poll_view,
+    update_poll_view,
+)
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+
+    path('vote/create', create_vote_view, name='create_vote'),
+    path(
+        'vote/<int:pollid>/<int:voterid>',
+        read_vote_view,
+        name='read_vote'
+    ),
+
+    path('poll/create', create_poll_view, name='create_poll'),
+    path('poll/<uuid:pollid>', read_poll_view, name='read_poll'),
+    path('poll/<uuid:pollid>/update', update_poll_view, name='update_poll')
+
 ]

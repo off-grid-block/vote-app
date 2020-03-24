@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Local
     'users.apps.UsersConfig',
+    'vote.apps.VoteConfig',
 ]
 
 
@@ -56,12 +57,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'vote.urls'
+ROOT_URLCONF = 'deon_vote.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'vote.wsgi.application'
+WSGI_APPLICATION = 'deon_vote.wsgi.application'
 
 
 # Database
