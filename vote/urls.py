@@ -1,24 +1,19 @@
 from django.urls import path
 from vote.views import (
-    create_vote_view,
-    read_vote_view,
-    create_poll_view,
-    read_poll_view,
-    update_poll_view,
+    vote_create_view,
+    vote_detail_view,
+    poll_create_view,
+    poll_detail_view,
 )
 
 
 urlpatterns = [
 
-    path('vote/create', create_vote_view, name='create_vote'),
-    path(
-        'vote/<int:pollid>/<int:voterid>',
-        read_vote_view,
-        name='read_vote'
-    ),
-
-    path('poll/create', create_poll_view, name='create_poll'),
-    path('poll/<uuid:pollid>', read_poll_view, name='read_poll'),
-    path('poll/<uuid:pollid>/update', update_poll_view, name='update_poll')
+    # poll management
+    path('<int:pollid>/new', vote_create_view, name='vote_create'),
+    # re_path(r'new$', poll_create_view, name='poll_create'),
+    # re_path(r'<int:pollid>$', poll_detail_view, name='poll_detail'),
+    path('<int:pollid>/<int:voterid>',
+         vote_detail_view, name='vote_detail'),
 
 ]

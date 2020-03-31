@@ -1,74 +1,48 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.http import HttpResponse
 
 
-import json
-import requests
+from vote.client import DeonClient
+from vote.forms import CreateVoteForm, CreatePollForm
 
 
-class DeonClient:
+def vote_create_view(request, pollid):
 
-    # DEON SDK API endpoint
-    API_URL = 'http://localhost:8000/api/v1/'
+    # pollid = 1234
 
-    # HTTP method constants
-    GET = 'GET'
-    POST = 'POST'
-    PUT = 'PUT'
+    if request.method == "POST":
+        form = CreateVoteForm(request.POST)
 
-    # Object types
-    VOTE = 'vote'
-    POLL = 'poll'
+        if form.is_valid():
+            voterid = form.cleaned_data['voterid']
 
-    def __init__(self, obj_type=VOTE, pollid=None, voterid=None,
-                 payload=None, method=GET, modifier=None):
-        self.url = self.build_request_url(obj_type, pollid, voterid, modifier)
+            payload = {}
+            payload['ollID'] = str(pollid)
+            payload['voterID'] = str(voterid)
+            payload['sex'] = form.cleaned_data['sex']
+            payload['age'] = str(form.cleaned_data['age'])
+            payload['content'] = form.cleaned_data['choice']
 
-        # set HTTP method
-        self.method = method
+            client = DeonClient(
+                obj_type='vote', method=request.method, payload=payload)
 
-        # serialize data to json format
-        try:
-            self.payload_json = json.dumps(payload)
-        except TypeError:
-            print('failed to serialize payload to JSON')
-            self.payload_json = None
+            print(client.payload)
 
-    @classmethod
-    def build_request_url(cls, obj_type, pollid, voterid, modifier):
+            err_resp = client.send_request()
+            if client.error_status_code:
+                print(err_resp)
+                return HttpResponse(status=client.error_status_code)
 
-        req_url = cls.API_URL + obj_type + '/'
-        if pollid:
-            req_url += str(pollid) + '/'
-        if voterid:
-            req_url += str(pollid) + '/'
-        if modifier:
-            req_url += str(pollid)
+            return redirect(reverse('vote_detail', args=[pollid, voterid]))
 
-        return req_url
+    else:
+        form = CreateVoteForm()
 
-    def send_request(self):
-        if self.method == self.GET:
-            resp = requests.get(self.url)
-
-        if self.method == self.POST:
-            resp = requests.post(self.url, json=self.payload_json)
-
-        if self.method == self.PUT:
-            resp = requests.put(self.url, json=self.payload_json)
-
-        if resp.status_code >= 300:
-            self.error_status_code = resp.status_code
-
-        resp_str = resp.content.decode('UTF-8')
-        return json.loads(resp_str)
+    return render(request, 'vote_create.html', {'form': form})
 
 
-def create_vote_view(request):
-    pass
-
-
-def read_vote_view(request, pollid, voterid):
+def vote_detail_view(request, pollid, voterid):
 
     # all users can access the public vote information
     public_data_client = DeonClient(
@@ -95,13 +69,9 @@ def read_vote_view(request, pollid, voterid):
     return render(request, 'vote_detail.html', context=context_dict)
 
 
-def create_poll_view(request):
+def poll_create_view(request):
     pass
 
 
-def read_poll_view(request, pollid):
-    pass
-
-
-def update_poll_view(request, pollid):
+def poll_detail_view(request, pollid):
     pass
