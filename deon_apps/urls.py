@@ -17,7 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 
+from vote import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('vote/', include('vote.urls')),
+    path('users/', include('users.urls')),
+    path('', views.HomePageView.as_view(), name='home')
 ]

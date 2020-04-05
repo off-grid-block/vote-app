@@ -1,0 +1,16 @@
+<h1>Poll Detail</h1>
+
+<div>
+	<p>poll id: 		 {{ public.pollID }}</p>
+	<p>number of votes:  {{ public.numVotes }}</p>
+	<p>status:           {{ public.status }}</p>
+	<p>content: 		 {{ private.content }}</p>
+</div>
+
+{% block content %}
+{% for vote in votes %}
+	<div>
+		{{ vote.Record }}
+	</div>
+{% endfor %}
+{% endblock content %}

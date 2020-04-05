@@ -16,20 +16,14 @@ class DeonClient:
     VOTE = 'vote'
     POLL = 'poll'
 
-    def __init__(self, obj_type=VOTE, pollid=None, voterid=None,
+    def __init__(self, obj_type=VOTE, pollid=None, params=None, voterid=None,
                  payload=None, method=GET, modifier=None):
 
         self.method = method
         self.error_status_code = None
         self.url = self.build_request_url(obj_type, pollid, voterid, modifier)
         self.payload = payload
-
-        # # serialize data to json format
-        # try:
-        #     self.payload_json = json.dumps(payload)
-        # except TypeError:
-        #     print('failed to serialize payload to JSON')
-        #     self.payload_json = None
+        self.params = params
 
     @classmethod
     def build_request_url(cls, obj_type, pollid, voterid, modifier):
@@ -38,7 +32,7 @@ class DeonClient:
 
     def send_request(self):
         if self.method == self.GET:
-            resp = requests.get(self.url)
+            resp = requests.get(self.url, params=self.params)
 
         elif self.method == self.POST:
             resp = requests.post(self.url, json=self.payload)
@@ -51,5 +45,6 @@ class DeonClient:
             return resp.text
 
         resp_str = resp.content.decode('UTF-8')
+
         if resp_str:
-            return json.loads(resp_str)
+            return json.loads(resp_str, strict=False)

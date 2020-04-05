@@ -1,0 +1,10 @@
+<h1>User{{ userid }}'s Votes</h1>
+
+
+{% block content %}
+{% for vote in votes %}
+	<div>
+		{{ vote.Record }}
+	</div>
+{% endfor %}
+{% endblock content %}
