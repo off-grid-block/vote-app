@@ -4,8 +4,14 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView
 
 
-from client import DeonClient
 from vote.forms import CreateVoteForm, CreatePollForm
+
+
+import json
+import requests
+
+
+API_URL = 'http://localhost:8000/api/v1'
 
 
 class HomePageView(TemplateView):
@@ -28,15 +34,9 @@ def vote_create_view(request, pollid):
             payload['age'] = str(form.cleaned_data['age'])
             payload['content'] = form.cleaned_data['choice']
 
-            client = DeonClient(
-                obj_type='vote', method=request.method, payload=payload)
-
-            print(client.payload)
-
-            err_resp = client.send_request()
-            if client.error_status_code:
-                print(err_resp)
-                return HttpResponse(status=client.error_status_code)
+            resp = requests.post(f'{API_URL}/vote', json=payload)
+            if resp.status_code >= 300:
+                return HttpResponse(status=resp.status_code)
 
             return redirect(reverse('vote_detail', args=[pollid, voterid]))
 
@@ -48,29 +48,15 @@ def vote_create_view(request, pollid):
 
 def vote_detail_view(request, pollid, voterid):
 
-    # all users can access the public vote information
-    public_data_client = DeonClient(
-        obj_type='vote', pollid=pollid, voterid=voterid, method=request.method)
-    public_data_dict = public_data_client.send_request()
+    # Send request to DEON Service API for vote data
+    resp = requests.get(f'{API_URL}/vote/{pollid}/{voterid}')
+    if resp.status_code >= 300:
+        return HttpResponse(status=resp.status_code)
 
-    if public_data_client.error_status_code:
-        return HttpResponse(status=public_data_client.error_status_code)
+    resp_str = resp.content.decode('UTF-8')
+    resp_json = json.loads(resp_str, strict=False)
 
-    # **TODO**: add check for permission
-    private_data_client = DeonClient(
-        obj_type='vote', pollid=pollid, voterid=voterid,
-        method=request.method, modifier='private')
-    private_data_dict = private_data_client.send_request()
-
-    if private_data_client.error_status_code:
-        return HttpResponse(status=private_data_client.error_status_code)
-
-    context_dict = {
-        'public': public_data_dict,
-        'private': private_data_dict,
-    }
-
-    return render(request, 'vote_detail.html', context=context_dict)
+    return render(request, 'vote_detail.html', context={'vote': resp_json})
 
 
 def poll_create_view(request):
@@ -84,14 +70,9 @@ def poll_create_view(request):
             payload['pollid'] = str(pollid)
             payload['content'] = form.cleaned_data['name']
 
-            client = DeonClient(
-                obj_type='poll', method=request.method, payload=payload
-            )
-
-            err_resp = client.send_request()
-            if client.error_status_code:
-                print(err_resp)
-                return HttpResponse(status=client.error_status_code)
+            resp = requests.post(f'{API_URL}/poll', json=payload)
+            if resp.status_code >= 300:
+                return HttpResponse(status=resp.status_code)
 
             return redirect(reverse('poll_detail', args=[pollid]))
 
@@ -103,42 +84,26 @@ def poll_create_view(request):
 
 def poll_detail_view(request, pollid):
 
-    # requesting public data
+    poll_resp = requests.get(f'{API_URL}/poll/{pollid}')
+    if poll_resp.status_code >= 300:
+        return HttpResponse(status=poll_resp.status_code)
 
-    public_data_client = DeonClient(
-        obj_type='poll', pollid=pollid, method=request.method)
-    public_data_resp = public_data_client.send_request()
+    poll_resp_str = poll_resp.content.decode('UTF-8')
+    poll_resp_json = json.loads(poll_resp_str, strict=False)
 
-    if public_data_client.error_status_code:
-        print('Error while requesting public poll data')
-        return HttpResponse(status=public_data_client.error_status_code)
+    votes = requests.get(
+        f'{API_URL}/vote',
+        params={'type': 'public', 'pollid': pollid}
+    )
+    if votes.status_code >= 300:
+        return HttpResponse(status=votes.status_code)
 
-    # requesting private data
-
-    private_data_client = DeonClient(
-        obj_type='poll', pollid=pollid, method=request.method,
-        modifier='private')
-    private_data_resp = private_data_client.send_request()
-
-    if private_data_client.error_status_code:
-        print('Error while requesting private poll data')
-        return HttpResponse(status=private_data_client.error_status_code)
-
-    # querying vote data
-
-    vote_data_client = DeonClient(
-        obj_type='vote', params={'type': 'public', 'pollid': pollid},
-        method=request.method)
-    vote_data_resp = vote_data_client.send_request()
-
-    if vote_data_client.error_status_code:
-        print(f'Error while requesting vote data for poll {pollid}')
-        return HttpResponse(status=vote_data_client.error_status_code)
+    votes_str = votes.content.decode('UTF-8')
+    votes_json = json.loads(votes_str, strict=False)
 
     context_dict = {
-        'public': public_data_resp,
-        'private': private_data_resp,
-        'votes': vote_data_resp
+        'poll_info': poll_resp_json,
+        'votes': votes_json,
     }
 
     return render(request, 'poll_detail.html', context=context_dict)
