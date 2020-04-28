@@ -1,5 +1,18 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/vote">Vote Service</a></li>
+    <li class="breadcrumb-item active" aria-current="page">new</li>
+  </ol>
+</nav>
+
 <form action="" method="post">
 	{% csrf_token %}
 	{{ form.as_p }}
 	<input type="submit" value="Submit">
 </form>
+
+{% endblock content %}

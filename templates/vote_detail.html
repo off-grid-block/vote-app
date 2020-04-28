@@ -1,5 +1,62 @@
-<h1>Vote Detail</h1>
+{% extends '_base.html' %}
 
-<p>pollID:  {{ vote.pollID }}</p>
-<p>content: {{ vote.content }}</p>
+{% block content %}
 
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/vote">Vote Service</a></li>
+    <li class="breadcrumb-item"><a href="/vote/{{ vote.pollID }}">poll ID #{{ vote.pollID }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">voter ID #{{ voterid }}</li>
+  </ol>
+</nav>
+
+<h2>Vote Details</h2>
+
+<div class="card m-4">
+    <div class="card-header">
+        Summary
+    </div>
+    <div class="card-body row">
+        <div class="col">
+            <div class="p-2">
+                <h5>Vote Content</h5>
+                <div class="d-flex bd-highlight">
+                	<div class="p-2 flex-grow-1 bd-highlight"><strong>Choice</strong></div>
+                	<div class="p-2 bd-highlight">
+                		<span class="badge badge-info">{{ vote.content }}</span>
+                	</div>
+            	</div>
+            </div>
+        </div>
+        <div class="col">
+
+            <div class="p-2">
+                <h5>More Info</h5>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Voter ID</strong></div>
+                <div class="p-2 bd-highlight">{{ voterid }}</div>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Date</strong></div>
+                <div class="p-2 bd-highlight">4/28/2020</div>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Voter sex</strong></div>
+                <div class="p-2 bd-highlight">{{ vote.voterSex }}</div>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Voter age</strong></div>
+                <div class="p-2 bd-highlight">{{ vote.voterAge }}</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

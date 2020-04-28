@@ -1,12 +1,55 @@
-{% block title %}Home{% endblock title %}
+{% extends '_base.html' %}
 
 {% block content %}
-<h1>Homepage</h1>
-{% if user.is_authenticated %}
-	Hi {{ user.email }}!
-	<p><a href="{% url 'logout' %}">Log Out</a></p>
-{% else %}
-	<p>You are not logged in.</p>
-	<a href="{% url 'login' %}">Log In</a>
-{% endif %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page">Vote Service</li>
+  </ol>
+</nav>
+
+<div class="jumbotron">
+	<h1 class="display-1 text-center p-2">DEON Vote Service</h1>
+	<h2 class="text-muted text-center p-2">Yale Institute for Network Science</h2>
+</div>
+
+<div class="container">
+	<div class="row">
+
+		<div class="col">
+
+			<h2>Explore Recent Polls</h2>
+
+			<ul class="list-group list-group-flush">
+			{% for poll in polls %}
+				<li class="list-group-item">
+					<a href="{% url 'poll_detail' pollid=poll.id %}">{{ poll.name }}</a>
+				</li>
+			{% endfor %}
+			</ul>
+
+		</div>
+
+		<div class="col-3">
+			<div class="card">
+				<div class="card-body">
+					{% if user.is_authenticated %}
+						<h5 class="card-title p-2">Hi {{ user.email }}!</h5>
+						<p><a href="{% url 'logout' %}">Log Out</a></p>
+					{% else %}
+						<h5 class="card-title mb-4">You are not logged in.</h5>
+						<a href="{% url 'login' %}" class="btn btn-primary mr-3">Log In</a>
+						<a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+
+
+
 {% endblock content %}

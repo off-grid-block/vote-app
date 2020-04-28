@@ -1,16 +1,84 @@
-<h1>Poll Detail</h1>
-
-<div>
-	<p>poll id: 		 {{ poll_info.PollID }}</p>
-	<p>number of votes:  {{ poll_info.NumVotes }}</p>
-	<p>status:           {{ poll_info.Status }}</p>
-	<p>content: 		 {{ poll_info.Content }}</p>
-</div>
+{% extends '_base.html' %}
 
 {% block content %}
-{% for vote in votes %}
-	<div>
-		{{ vote.Record }}
-	</div>
-{% endfor %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/vote">Vote Service</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ poll_info.Content.content }}</li>
+  </ol>
+</nav>
+
+
+<h2>
+    {{ poll_info.Content.content }} 
+    <small class="text-muted">/ Poll ID #{{ poll_info.PollID }}</small>
+</h2>
+
+<div class="d-flex">
+    <div class="flex-grow-1">
+        <h4><span class="badge badge-info">{{ poll_info.Status }}</span></h4>
+    </div>
+    <div class="">
+        <h4><a href="/vote/{{ poll_info.PollID }}/new" class="btn btn-primary">Submit a Vote</a></h4>
+    </div>
+</div>
+
+
+
+<div class="card m-4">
+    <div class="card-header">
+        Summary
+    </div>
+    <div class="card-body row">
+        <div class="col">
+            <div class="p-2">
+                <h5>Description</h5>
+                <p>This is a description of the poll. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+        </div>
+        <div class="col">
+
+            <div class="p-2">
+                <h5>More Info</h5>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Number of votes</strong></div>
+                <div class="p-2 bd-highlight">{{ poll_info.NumVotes }}</div>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Start date</strong></div>
+                <div class="p-2 bd-highlight">4/28/2020</div>
+            </div>
+
+            <div class="d-flex bd-highlight">
+                <div class="p-2 flex-grow-1 bd-highlight"><strong>Close date</strong></div>
+                <div class="p-2 bd-highlight">5/1/2020</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <th scope="col">Voter ID</th>
+        <th scope="col">Voter Age</th>
+        <th scope="col">Voter Sex</th>
+        <th scope="col">Link</th>
+    </thead>
+    <tbody>
+        {% for vote in votes %}
+        <tr>
+            <td>{{ vote.Record.voterID }}</td>
+            <td>{{ vote.Record.voterAge }}</td>
+            <td>{{ vote.Record.voterSex }}</td>
+            <td><a href="/vote/{{ poll_info.PollID }}/{{ vote.Record.voterID }}" class="btn btn-primary">View Details</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    
+</table>
+
 {% endblock content %}

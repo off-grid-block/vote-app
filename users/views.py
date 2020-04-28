@@ -3,8 +3,12 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views.generic import TemplateView, CreateView
 
-from client import DeonClient
+from vote.models import Poll
 from users.forms import CustomUserCreationForm
+from deon_apps.settings import API_URL
+
+import requests
+import json
 
 
 class HomePageView(TemplateView):
@@ -18,18 +22,16 @@ class SignupPageView(CreateView):
 
 
 def user_vote_view(request, userid):
+    resp = requests.get(f'{API_URL}/vote', params={'voterid': userid})
+    if resp.status_code >= 300:
+        return HttpResponse(status=resp.status_code)
 
-    vote_data_client = DeonClient(
-        obj_type='vote', params={'voterid': userid},
-        method=request.method)
-    vote_data_resp = vote_data_client.send_request()
-
-    if vote_data_client.error_status_code:
-        return HttpResponse(status=vote_data_client.error_status_code)
+    resp_str = resp.content.decode('UTF-8')
+    resp_json = json.loads(resp_str, strict=False)
 
     context_dict = {
         'userid': userid,
-        'votes': vote_data_resp,
+        'votes': resp_json,
     }
 
     return render(request, 'user_vote.html', context_dict)
