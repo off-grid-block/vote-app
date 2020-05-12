@@ -3,7 +3,6 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views.generic import TemplateView, CreateView
 
-from vote.models import Poll
 from users.forms import CustomUserCreationForm
 from deon_apps.settings import API_URL
 
