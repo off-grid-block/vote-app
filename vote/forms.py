@@ -10,5 +10,6 @@ class CreateVoteForm(forms.Form):
 
 class CreatePollForm(forms.Form):
     # pollid = forms.IntegerField()
-    name = forms.CharField(max_length=100)
+    title = forms.CharField(max_length=100)
+    content = forms.CharField(max_length=200)
     # end_date = forms.DateField()

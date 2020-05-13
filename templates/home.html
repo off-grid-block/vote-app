@@ -23,7 +23,7 @@
 			<ul class="list-group list-group-flush">
 			{% for poll in polls %}
 				<li class="list-group-item">
-					<a href="{% url 'poll_detail' pollid=poll.pollID %}">{{ poll.pollID }}</a>
+					<a href="{% url 'poll_detail' pollid=poll.pollID %}">{{ poll.title }}</a>
 				</li>
 			{% endfor %}
 			</ul>

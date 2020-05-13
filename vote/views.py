@@ -19,7 +19,7 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         resp = requests.get(f'{API_URL}/poll')
         if resp.status_code >= 300:
-            return HttpResponse(status=resp.status_code)
+            raise Exception('Request failed')
 
         poll_resp_str = resp.content.decode('UTF-8')
         poll_resp_json = json.loads(poll_resp_str, strict=False)
@@ -54,10 +54,14 @@ def vote_create_view(request, pollid):
     else:
         form = CreateVoteForm()
 
+    poll = requests.get(f'{API_URL}/poll/{pollid}')
+    poll_str = poll.content.decode('UTF-8')
+    poll_json = json.loads(poll_str, strict=False)
+
     return render(
         request,
         'vote_create.html',
-        {'form': form, 'pollid': pollid}
+        {'form': form, 'poll': poll_json}
     )
 
 
@@ -85,7 +89,8 @@ def poll_create_view(request):
         if form.is_valid():
             payload = {
                 'pollid': str(uuid.uuid4()),
-                'content': form.cleaned_data['name'],
+                'title': form.cleaned_data['title'],
+                'content': form.cleaned_data['content'],
             }
             resp = requests.post(f'{API_URL}/poll', json=payload)
             if resp.status_code >= 300:
@@ -103,13 +108,14 @@ def poll_create_view(request):
 
 def poll_detail_view(request, pollid):
 
-    poll_resp = requests.get(f'{API_URL}/poll/{pollid}')
-    if poll_resp.status_code >= 300:
-        return HttpResponse(status=poll_resp.status_code)
+    poll = requests.get(f'{API_URL}/poll/{pollid}')
+    if poll.status_code >= 300:
+        return HttpResponse(status=poll.status_code)
 
-    poll_resp_str = poll_resp.content.decode('UTF-8')
-    poll_resp_json = json.loads(poll_resp_str, strict=False)
-    poll_resp_json['Content'] = json.loads(poll_resp_json['Content'])
+    poll_str = poll.content.decode('UTF-8')
+    poll_json = json.loads(poll_str, strict=False)
+    if poll_json['Content']:
+        poll_json['Content'] = json.loads(poll_json['Content'])
 
     votes = requests.get(
         f'{API_URL}/vote',
@@ -122,7 +128,7 @@ def poll_detail_view(request, pollid):
     votes_json = json.loads(votes_str, strict=False)
 
     context_dict = {
-        'poll_info': poll_resp_json,
+        'poll': poll_json,
         'votes': votes_json,
     }
 

@@ -5,23 +5,28 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/vote">Vote Service</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ poll_info.Content.content }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ poll.Title }}</li>
   </ol>
 </nav>
 
 
 <h2>
-    {{ poll_info.Content.content }} 
-    <small class="text-muted">/ Poll ID #{{ poll_info.PollID }}</small>
+    {{ poll.Title }} 
+    <small class="text-muted">/ Poll ID #{{ poll.PollID }}</small>
 </h2>
 
 <div class="d-flex">
     <div class="flex-grow-1">
-        <h4><span class="badge badge-info">{{ poll_info.Status }}</span></h4>
+        <h4><span class="badge badge-info">{{ poll.Status }}</span></h4>
     </div>
+
+    {% if poll.Content %}
+
     <div class="">
-        <h4><a href="/vote/{{ poll_info.PollID }}/new" class="btn btn-primary">Submit a Vote</a></h4>
+        <h4><a href="/vote/{{ poll.PollID }}/new" class="btn btn-primary">Submit a Vote</a></h4>
     </div>
+
+    {% endif %}
 </div>
 
 
@@ -34,28 +39,55 @@
         <div class="col">
             <div class="p-2">
                 <h5>Description</h5>
-                <p>This is a description of the poll. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p>This is a description of the poll. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
             </div>
         </div>
         <div class="col">
 
             <div class="p-2">
+
+                <!-- More Info section -->
                 <h5>More Info</h5>
-            </div>
 
-            <div class="d-flex bd-highlight">
-                <div class="p-2 flex-grow-1 bd-highlight"><strong>Number of votes</strong></div>
-                <div class="p-2 bd-highlight">{{ poll_info.NumVotes }}</div>
-            </div>
+                {% if poll.Content %}
 
-            <div class="d-flex bd-highlight">
-                <div class="p-2 flex-grow-1 bd-highlight"><strong>Start date</strong></div>
-                <div class="p-2 bd-highlight">4/28/2020</div>
-            </div>
+                <div class="d-flex bd-highlight">
+                    <div class="p-1 flex-grow-1 bd-highlight"><strong>Number of votes</strong></div>
+                    <div class="p-1 bd-highlight">{{ poll.NumVotes }}</div>
+                </div>
 
-            <div class="d-flex bd-highlight">
-                <div class="p-2 flex-grow-1 bd-highlight"><strong>Close date</strong></div>
-                <div class="p-2 bd-highlight">5/1/2020</div>
+                <div class="d-flex bd-highlight">
+                    <div class="p-1 flex-grow-1 bd-highlight"><strong>Start date</strong></div>
+                    <div class="p-1 bd-highlight">4/28/2020</div>
+                </div>
+
+                <div class="d-flex bd-highlight">
+                    <div class="p-1 flex-grow-1 bd-highlight"><strong>Close date</strong></div>
+                    <div class="p-1 bd-highlight">5/1/2020</div>
+                </div>
+
+                {% else %}
+
+                <p><strong>Access restricted</strong></p>
+
+                {% endif %}
+
+                <!-- Private Content section -->
+                <h5 class="pt-4">Poll Choices</h5>
+
+                {% if poll.Content %}
+
+                <div class="d-flex bd-highlight">
+                    <div class="p-1 flex-grow-1 bd-highlight"><strong>Choices</strong></div>
+                    <div class="p-1 bd-highlight">{{ poll.Content.content }}</div>
+                </div>
+
+                {% else %}
+
+                <p><strong>Access restricted</strong></p>
+
+                {% endif %}
+
             </div>
         </div>
     </div>
@@ -68,16 +100,28 @@
         <th scope="col">Voter Sex</th>
         <th scope="col">Link</th>
     </thead>
+
+    {% if poll.Content %}
     <tbody>
         {% for vote in votes %}
         <tr>
             <td>{{ vote.Record.voterID }}</td>
             <td>{{ vote.Record.voterAge }}</td>
             <td>{{ vote.Record.voterSex }}</td>
-            <td><a href="/vote/{{ poll_info.PollID }}/{{ vote.Record.voterID }}" class="btn btn-primary">View Details</a></td>
+            <td><a href="/vote/{{ poll.PollID }}/{{ vote.Record.voterID }}" class="btn btn-primary">View Details</a></td>
         </tr>
         {% endfor %}
     </tbody>
+    {% else %}
+    <tbody>
+        <tr>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </tbody>
+    {% endif %}
     
 </table>
 
