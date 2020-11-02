@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 
 from vote.forms import CreateVoteForm, CreatePollForm
-from deon_apps.settings import API_URL
+from deon_apps.settings import API_URL, CORE_URL
 
 import json
 import requests
@@ -19,7 +19,7 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         resp = requests.get(f'{API_URL}/poll')
         if resp.status_code >= 300:
-            raise Exception('Request failed')
+            return context
 
         poll_resp_str = resp.content.decode('UTF-8')
         poll_resp_json = json.loads(poll_resp_str, strict=False)
@@ -27,6 +27,22 @@ class HomePageView(TemplateView):
 
         context['polls'] = polls
         return context
+
+
+@login_required
+def register_view(request):
+
+    payload = {
+        "Name": "Voting",
+        "Secret": "kerapwd",
+        "Type": "user"
+    }
+
+    resp = requests.post(f'{CORE_URL}/register', json=payload)
+    if resp.status_code >= 300:
+        return HttpResponse(status=resp.status_code)
+
+    return render(request, 'register.html')
 
 
 @login_required

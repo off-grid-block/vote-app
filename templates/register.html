@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/vote">Vote Service</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ poll.Title }}</li>
+  </ol>
+</nav>
+
+<body>
+    You have succesfully registered the vote application with the DEON core service!
+    <a href="{% url 'homepage' %}">Return to the homepage.</a>
+</body>
+
+{% endblock content %}
