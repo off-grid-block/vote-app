@@ -11,12 +11,20 @@ import json
 import requests
 import uuid
 
+global REGISTERED
+REGISTERED = False
+
 
 class HomePageView(TemplateView):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        global REGISTERED
+        if not REGISTERED:
+            return context
+
         resp = requests.get(f'{API_URL}/poll')
         if resp.status_code >= 300:
             return context
@@ -41,6 +49,9 @@ def register_view(request):
     resp = requests.post(f'{CORE_URL}/register', json=payload)
     if resp.status_code >= 300:
         return HttpResponse(status=resp.status_code)
+
+    global REGISTERED
+    REGISTERED = True
 
     return render(request, 'register.html')
 

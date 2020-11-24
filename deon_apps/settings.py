@@ -138,5 +138,5 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 # DEON Service API URL
-CORE_URL = 'http://localhost:8001/api/v1'
-API_URL = 'http://localhost:8002/api/v1'
+CORE_URL = 'http://localhost:8000/api/v1'
+API_URL = 'http://localhost:8001/api/v1'
