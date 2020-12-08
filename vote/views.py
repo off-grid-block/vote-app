@@ -5,14 +5,14 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 
 from vote.forms import CreateVoteForm, CreatePollForm
-from deon_apps.settings import API_URL, CORE_URL
+from deon_apps.settings import API_URL
 
 import json
 import requests
 import uuid
 
-global REGISTERED
-REGISTERED = False
+# global REGISTERED
+# REGISTERED = False
 
 
 class HomePageView(TemplateView):
@@ -20,10 +20,6 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        global REGISTERED
-        if not REGISTERED:
-            return context
 
         resp = requests.get(f'{API_URL}/poll')
         if resp.status_code >= 300:
@@ -37,23 +33,23 @@ class HomePageView(TemplateView):
         return context
 
 
-@login_required
-def register_view(request):
+# @login_required
+# def register_view(request):
 
-    payload = {
-        "Name": "Voting",
-        "Secret": "kerapwd",
-        "Type": "user"
-    }
+#     payload = {
+#         "Name": "Voting",
+#         "Secret": "kerapwd",
+#         "Type": "user"
+#     }
 
-    resp = requests.post(f'{CORE_URL}/register', json=payload)
-    if resp.status_code >= 300:
-        return HttpResponse(status=resp.status_code)
+#     resp = requests.post(f'{CORE_URL}/register', json=payload)
+#     if resp.status_code >= 300:
+#         return HttpResponse(status=resp.status_code)
 
-    global REGISTERED
-    REGISTERED = True
+#     global REGISTERED
+#     REGISTERED = True
 
-    return render(request, 'register.html')
+#     return render(request, 'register.html')
 
 
 @login_required
