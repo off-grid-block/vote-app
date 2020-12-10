@@ -52,6 +52,10 @@ class HomePageView(TemplateView):
 #     return render(request, 'register.html')
 
 
+def error_view(request):
+    return render(request, 'error.html')
+
+
 @login_required
 def vote_create_view(request, pollid):
     if request.method == "POST":
@@ -70,7 +74,7 @@ def vote_create_view(request, pollid):
 
             resp = requests.post(f'{API_URL}/vote', json=payload)
             if resp.status_code >= 300:
-                return HttpResponse(status=resp.status_code)
+                return redirect(reverse('error'))
 
             return redirect(reverse('vote_detail', args=[pollid, voterid]))
 
@@ -92,7 +96,7 @@ def vote_detail_view(request, pollid, voterid):
     # Send request to DEON Service API for vote data
     resp = requests.get(f'{API_URL}/vote/{pollid}/{voterid}')
     if resp.status_code >= 300:
-        return HttpResponse(status=resp.status_code)
+        return redirect(reverse('error'))
 
     resp_str = resp.content.decode('UTF-8')
     resp_json = json.loads(resp_str, strict=False)
@@ -116,8 +120,9 @@ def poll_create_view(request):
                 'content': form.cleaned_data['content'],
             }
             resp = requests.post(f'{API_URL}/poll', json=payload)
+
             if resp.status_code >= 300:
-                return HttpResponse(status=resp.status_code)
+                return redirect(reverse('error'))
 
             return redirect(
                 reverse('poll_detail', args=[payload['pollid']])
@@ -133,7 +138,7 @@ def poll_detail_view(request, pollid):
 
     poll = requests.get(f'{API_URL}/poll/{pollid}')
     if poll.status_code >= 300:
-        return HttpResponse(status=poll.status_code)
+        return redirect(reverse('error'))
 
     poll_str = poll.content.decode('UTF-8')
     poll_json = json.loads(poll_str, strict=False)
@@ -145,7 +150,7 @@ def poll_detail_view(request, pollid):
         params={'type': 'public', 'pollid': pollid}
     )
     if votes.status_code >= 300:
-        return HttpResponse(status=votes.status_code)
+        return redirect(reverse('error'))
 
     votes_str = votes.content.decode('UTF-8')
     votes_json = json.loads(votes_str, strict=False)
