@@ -21,9 +21,16 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        resp = requests.get(f'{API_URL}/poll')
-        if resp.status_code >= 300:
+        try:
+            resp = requests.get(f'{API_URL}/poll')
+        except requests.exceptions.Timeout:
+            context['error'] = "Request to vote API timed out."
             return context
+        except requests.exceptions.ConnectionError:
+            context['error'] = "Failed to connect to vote API. Is it running?"
+            return context
+        except requests.exceptions.RequestException as e:
+            raise(e)
 
         poll_resp_str = resp.content.decode('UTF-8')
         poll_resp_json = json.loads(poll_resp_str, strict=False)

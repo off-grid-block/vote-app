@@ -19,6 +19,9 @@
 		<div class="col">
 
 			<h2>Explore Recent Polls</h2>
+			{% if error %}
+				<p>{{ error }}</p>
+			{% endif %}
 
 			<ul class="list-group list-group-flush">
 			{% for poll in polls %}
